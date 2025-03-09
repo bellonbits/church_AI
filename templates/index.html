@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaithJourney | Your AI Spiritual Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7559da;
+            --secondary: #32ccdd;
+            --accent: #ff7b9c;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            background-image: url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: -1;
+        }
+        
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .hero-section h1 {
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card {
+            border: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .tab-pane {
+            padding: 30px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .nav-tabs {
+            border-bottom: none;
+        }
+        
+        .nav-link {
+            border: none;
+            font-weight: 600;
+            padding: 15px 25px;
+            border-radius: 10px 10px 0 0;
+            margin-right: 5px;
+            color: var(--dark);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(117, 89, 218, 0.1);
+        }
+        
+        .nav-link.active {
+            background-color: white !important;
+            color: var(--primary) !important;
+            border: none;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #6347c0;
+            border-color: #6347c0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(117, 89, 218, 0.3);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(117, 89, 218, 0.2);
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+        
+        .result-card {
+            background-color: #f8f9fe;
+            border-radius: 15px;
+            border-left: 5px solid var(--primary);
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .result-icon {
+            background-color: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .result-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            padding: 40px 0;
+        }
+        
+        .spinner-border {
+            color: var(--primary);
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .verse-box {
+            background-color: rgba(117, 89, 218, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .verse-text {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .verse-reference {
+            font-weight: 700;
+            color: var(--primary);
+            text-align: right;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 30px 0;
+            margin-top: 80px;
+        }
+        
+        .content-container {
+            white-space: pre-line;
+            line-height: 1.7;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-link {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-pray me-2"></i>FaithJourney</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#assistant">AI Assistant</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" id="home">
+        <div class="hero-section text-center">
+            <h1>Your AI Spiritual Companion</h1>
+            <p class="lead mb-4">Growing in faith has never been easier. Get personalized Bible studies, quiet time plans, and answers to your spiritual questions.</p>
+            <a href="#assistant" class="btn btn-light btn-lg">Start Your Journey</a>
+        </div>
+        
+        <section id="features" class="py-5">
+            <h2 class="text-center mb-5">How FaithJourney Helps You Grow</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card feature-card text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-book-open feature-icon"></i>
+                            <h5 class="card-title">Personalized Quiet Time</h5>
+                            <p class="card-text">Get tailored quiet time plans based on your available time and spiritual focus.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card feature-card text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-bible feature-icon"></i>
+                            <h5 class="card-title">Bible Study Guides</h5>
+                            <p class="card-text">Dive deeper into any passage with context, explanations, and application questions.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card feature-card text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-lightbulb feature-icon"></i>
+                            <h5 class="card-title">Spiritual Q&A</h5>
+                            <p class="card-text">Get Biblical answers to your questions about faith, life, and Christianity.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card feature-card text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-book feature-icon"></i>
+                            <h5 class="card-title">Reading Recommendations</h5>
+                            <p class="card-text">Discover Christian books that will help you grow in specific areas of your faith.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="verse-box">
+            <p class="verse-text">"Your word is a lamp for my feet, a light on my path."</p>
+            <p class="verse-reference">Psalm 119:105</p>
+        </div>
+
+        <section id="assistant" class="py-5">
+            <h2 class="text-center mb-4">Your AI Spiritual Assistant</h2>
+            
+            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="quiet-time-tab" data-bs-toggle="tab" data-bs-target="#quiet-time" type="button" role="tab">
+                        <i class="fas fa-pray me-2"></i>Quiet Time
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="books-tab" data-bs-toggle="tab" data-bs-target="#books" type="button" role="tab">
+                        <i class="fas fa-book me-2"></i>Books
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="bible-study-tab" data-bs-toggle="tab" data-bs-target="#bible-study" type="button" role="tab">
+                        <i class="fas fa-bible me-2"></i>Bible Study
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="question-tab" data-bs-toggle="tab" data-bs-target="#question" type="button" role="tab">
+                        <i class="fas fa-question-circle me-2"></i>Ask a Question
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="myTabContent">
+                <!-- Quiet Time Tab -->
+                <div class="tab-pane fade show active" id="quiet-time" role="tabpanel">
+                    <h4 class="mb-4">Plan Your Quiet Time with God</h4>
+                    <p class="text-muted mb-4">Create a personalized quiet time plan based on your available time and spiritual focus.</p>
+                    
+                    <form id="quiet-time-form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="duration" class="form-label">How much time do you have? (minutes)</label>
+                                <input type="range" class="form-range" id="duration" min="5" max="60" value="15" oninput="durationOutput.value = duration.value">
+                                <output id="durationOutput">15</output> minutes
+                            </div>
+                            <div class="col-md-6">
+                                <label for="focus-area" class="form-label">What would you like to focus on? (optional)</label>
+                                <input type="text" class="form-control" id="focus-area" placeholder="e.g., Prayer, Thankfulness, Trust, etc.">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-4">
+                            <i class="fas fa-pray me-2"></i>Generate My Quiet Time Plan
+                        </button>
+                    </form>
+                    
+                    <div class="loading-spinner d-none" id="quiet-time-loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card d-none" id="quiet-time-result">
+                        <div class="result-header">
+                            <div class="result-icon">
+                                <i class="fas fa-pray"></i>
+                            </div>
+                            <h5 class="result-title">Your Quiet Time Plan</h5>
+                        </div>
+                        <div id="quiet-time-content" class="content-container"></div>
+                    </div>
+                </div>
+                
+                <!-- Books Tab -->
+                <div class="tab-pane fade" id="books" role="tabpanel">
+                    <h4 class="mb-4">Christian Book Recommendations</h4>
+                    <p class="text-muted mb-4">Discover books that will help you grow in your faith journey.</p>
+                    
+                    <form id="books-form">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="topic" class="form-label">Topic (optional)</label>
+                                <input type="text" class="form-control" id="topic" placeholder="e.g., Prayer, Discipleship, etc.">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="spiritual-level" class="form-label">Your Spiritual Level</label>
+                                <select class="form-select" id="spiritual-level">
+                                    <option value="beginner">Beginner - New to faith</option>
+                                    <option value="intermediate">Intermediate - Growing steadily</option>
+                                    <option value="advanced">Advanced - Seeking depth</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="count" class="form-label">Number of Books</label>
+                                <select class="form-select" id="count">
+                                    <option value="3">3 Books</option>
+                                    <option value="5">5 Books</option>
+                                    <option value="7">7 Books</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-4">
+                            <i class="fas fa-book me-2"></i>Find Books For Me
+                        </button>
+                    </form>
+                    
+                    <div class="loading-spinner d-none" id="books-loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card d-none" id="books-result">
+                        <div class="result-header">
+                            <div class="result-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h5 class="result-title">Recommended Books</h5>
+                        </div>
+                        <div id="books-content" class="content-container"></div>
+                    </div>
+                </div>
+                
+                <!-- Bible Study Tab -->
+                <div class="tab-pane fade" id="bible-study" role="tabpanel">
+                    <h4 class="mb-4">In-Depth Bible Study Guide</h4>
+                    <p class="text-muted mb-4">Get a detailed study guide for any passage of Scripture with context, explanations, and application questions.</p>
+                    
+                    <form id="bible-study-form">
+                        <div class="mb-3">
+                            <label for="passage" class="form-label">Enter Bible Passage</label>
+                            <input type="text" class="form-control" id="passage" placeholder="e.g., John 3:1-16, Romans 8:28-39, Psalm 23">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-bible me-2"></i>Create Study Guide
+                        </button>
+                    </form>
+                    
+                    <div class="loading-spinner d-none" id="bible-study-loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card d-none" id="bible-study-result">
+                        <div class="result-header">
+                            <div class="result-icon">
+                                <i class="fas fa-bible"></i>
+                            </div>
+                            <h5 class="result-title">Bible Study Guide</h5>
+                        </div>
+                        <div id="bible-study-content" class="content-container"></div>
+                    </div>
+                </div>
+                
+                <!-- Question Tab -->
+                <div class="tab-pane fade" id="question" role="tabpanel">
+                    <h4 class="mb-4">Ask a Question about Christianity</h4>
+                    <p class="text-muted mb-4">Get Biblical answers to your questions about faith, Christian living, and theology.</p>
+                    
+                    <form id="question-form">
+                        <div class="mb-3">
+                            <label for="question" class="form-label">What's your question?</label>
+                            <textarea class="form-control" id="question" rows="4" placeholder="e.g., What does the Bible say about forgiveness? How can I hear God's voice?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-question-circle me-2"></i>Ask My Question
+                        </button>
+                    </form>
+                    
+                    <div class="loading-spinner d-none" id="question-loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card d-none" id="question-result">
+                        <div class="result-header">
+                            <div class="result-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <h5 class="result-title">Biblical Answer</h5>
+                        </div>
+                        <div id="question-content" class="content-container"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="container text-center">
+            <p>© 2025 FaithJourney - Helping young Christians grow in their faith journey</p>
+            <p><small>This AI assistant is powered by advanced technology to support your spiritual growth. All responses are based on Biblical teachings.</small></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Quiet Time Form
+            document.getElementById('quiet-time-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const duration = document.getElementById('duration').value;
+                const focusArea = document.getElementById('focus-area').value;
+                
+                document.getElementById('quiet-time-result').classList.add('d-none');
+                document.getElementById('quiet-time-loading').classList.remove('d-none');
+                
+                try {
+                    const response = await fetch('/quiet-time', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            duration: parseInt(duration),
+                            focus_area: focusArea || null
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    document.getElementById('quiet-time-content').innerHTML = formatResponse(data.result);
+                    document.getElementById('quiet-time-loading').classList.add('d-none');
+                    document.getElementById('quiet-time-result').classList.remove('d-none');
+                    
+                    // Scroll to result
+                    document.getElementById('quiet-time-result').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                } catch (error) {
+                    document.getElementById('quiet-time-content').innerHTML = 'Error: ' + error.message;
+                    document.getElementById('quiet-time-loading').classList.add('d-none');
+                    document.getElementById('quiet-time-result').classList.remove('d-none');
+                }
+            });
+            
+            // Books Form
+            document.getElementById('books-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const topic = document.getElementById('topic').value;
+                const spiritualLevel = document.getElementById('spiritual-level').value;
+                const count = document.getElementById('count').value;
+                
+                document.getElementById('books-result').classList.add('d-none');
+                document.getElementById('books-loading').classList.remove('d-none');
+                
+                try {
+                    const response = await fetch('/recommend-books', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            topic: topic || null,
+                            spiritual_level: spiritualLevel,
+                            count: parseInt(count)
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    document.getElementById('books-content').innerHTML = formatResponse(data.result);
+                    document.getElementById('books-loading').classList.add('d-none');
+                    document.getElementById('books-result').classList.remove('d-none');
+                    
+                    // Scroll to result
+                    document.getElementById('books-result').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                } catch (error) {
+                    document.getElementById('books-content').innerHTML = 'Error: ' + error.message;
+                    document.getElementById('books-loading').classList.add('d-none');
+                    document.getElementById('books-result').classList.remove('d-none');
+                }
+            });
+            
+            // Bible Study Form
+            document.getElementById('bible-study-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const passage = document.getElementById('passage').value;
+                
+                document.getElementById('bible-study-result').classList.add('d-none');
+                document.getElementById('bible-study-loading').classList.remove('d-none');
+                
+                try {
+                    const response = await fetch('/bible-study', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            passage: passage
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    document.getElementById('bible-study-content').innerHTML = formatResponse(data.result);
+                    document.getElementById('bible-study-loading').classList.add('d-none');
+                    document.getElementById('bible-study-result').classList.remove('d-none');
+                    
+                    // Scroll to result
+                    document.getElementById('bible-study-result').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                } catch (error) {
+                    document.getElementById('bible-study-content').innerHTML = 'Error: ' + error.message;
+                    document.getElementById('bible-study-loading').classList.add('d-none');
+                    document.getElementById('bible-study-result').classList.remove('d-none');
+                }
+            });
+            
+            // Question Form
+document.getElementById('question-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const question = document.getElementById('question').value;
+    
+    // Validate input
+    if (!question || question.trim() === '') {
+        alert('Please enter a question first.');
+        return;
+    }
+    
+    // Show loading, hide result
+    document.getElementById('question-result').classList.add('d-none');
+    document.getElementById('question-loading').classList.remove('d-none');
+    
+    try {
+        const response = await fetch('/answer-question', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                question: question
+            })
+        });
+        
+        const data = await response.json();
+        
+        // Make sure data.result exists before trying to format it
+        if (data && data.result) {
+            // Instead of using a separate formatResponse function, format directly
+            const formattedResult = typeof data.result === 'string' 
+                ? data.result.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')
+                : 'Received response in unexpected format';
+                
+            document.getElementById('question-content').innerHTML = `<p>${formattedResult}</p>`;
+        } else {
+            document.getElementById('question-content').innerHTML = 
+                '<p>No response received from the server. Please try again.</p>';
+        }
+        
+        // Hide loading, show result
+        document.getElementById('question-loading').classList.add('d-none');
+        document.getElementById('question-result').classList.remove('d-none');
+        
+        // Scroll to result
+        document.getElementById('question-result').scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    } catch (error) {
+        document.getElementById('question-content').innerHTML = 'Error: ' + error.message;
+        document.getElementById('question-loading').classList.add('d-none');
+        document.getElementById('question-result').classList.remove('d-none');
+    }
+});
+            
+            // Format response with proper styling for Bible verses
+            function formatResponse(text) {
+                // Format Bible references
+                const versePattern = /([1-3]?\s*[A-Za-z]+\s+\d+:\d+(?:-\d+)?)/g;
+                let formattedText = text.replace(versePattern, '<strong class="text-primary">$1</strong>');
+                
+                // Add line breaks
+                formattedText = formattedText.replace(/\n/g, '<br>');
+                
+                // Format headings
+                formattedText = formattedText.replace(/([A-Z][A-Z\s]+:)/g, '<h5 class="mt-4 mb-3">$1</h5>');
+                
+                return formattedText;
+            }
+        });
+    </script>
+</body>
+</html>
