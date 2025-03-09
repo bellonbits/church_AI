@@ -1,23 +1,19 @@
+# api/index.py - Main serverless function entry point
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 import requests
+import os
 import json
 from datetime import datetime
-from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
-import uvicorn
 
-# API Configuration
-GROQ_API_KEY = "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"
+# API Configuration - Use environment variables for sensitive info
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")  # Set this in Vercel Environment Variables
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "llama3-70b-8192"
 
+# Create FastAPI app
 app = FastAPI(title="Church AI Assistant")
-
-# You'll need to create these directories manually
-templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 class ChurchAssistant:
     def __init__(self):
@@ -153,42 +149,43 @@ class ChurchAssistant:
 # Create an instance of the Church Assistant
 assistant = ChurchAssistant()
 
-# Define API endpoints
-@app.get("/", response_class=HTMLResponse)
-async def home_page(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
+# Define the request models using Pydantic
 class QuietTimeRequest(BaseModel):
     duration: int = 15
     focus_area: str = None
-
-@app.post("/quiet-time")
-async def get_quiet_time(request: QuietTimeRequest):
-    response = assistant.suggest_quiet_time_plan(request.duration, request.focus_area)
-    return {"result": response}
 
 class BookRequest(BaseModel):
     topic: str = None
     spiritual_level: str = "beginner" 
     count: int = 3
 
-@app.post("/recommend-books")
-async def get_book_recommendations(request: BookRequest):
-    response = assistant.recommend_books(request.topic, request.spiritual_level, request.count)
-    return {"result": response}
-
 class BibleStudyRequest(BaseModel):
     passage: str
-
-@app.post("/bible-study")
-async def get_bible_study(request: BibleStudyRequest):
-    response = assistant.bible_study_guide(request.passage)
-    return {"result": response}
 
 class QuestionRequest(BaseModel):
     question: str
 
-@app.post("/answer-question")
+# Define API endpoints for Vercel
+@app.get("/api")
+async def root():
+    return {"message": "Church AI Assistant API is running"}
+
+@app.post("/api/quiet-time")
+async def get_quiet_time(request: QuietTimeRequest):
+    response = assistant.suggest_quiet_time_plan(request.duration, request.focus_area)
+    return {"result": response}
+
+@app.post("/api/recommend-books")
+async def get_book_recommendations(request: BookRequest):
+    response = assistant.recommend_books(request.topic, request.spiritual_level, request.count)
+    return {"result": response}
+
+@app.post("/api/bible-study")
+async def get_bible_study(request: BibleStudyRequest):
+    response = assistant.bible_study_guide(request.passage)
+    return {"result": response}
+
+@app.post("/api/answer-question")
 async def answer_christian_question(request: QuestionRequest):
     if not request.question or request.question.strip() == "":
         return {"result": "Please provide a specific question about Christianity."}
@@ -197,15 +194,7 @@ async def answer_christian_question(request: QuestionRequest):
         response = assistant.answer_question(request.question)
         return {"result": response}
     except Exception as e:
-        # Log the error
+        # Log the error (Vercel will capture this in logs)
         print(f"Error processing question: {e}")
         return {"result": "I apologize, but there was an issue processing your question. Please try again later.",
                 "error": str(e)}
-
-# Main function to run the app
-if __name__ == "__main__":
-    print("Church AI Assistant API is starting...")
-    print("Make sure to create the following directories:")
-    print("1. templates/ - Place the index.html file here")
-    print("2. static/ - Place the style.css and script.js files here")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
