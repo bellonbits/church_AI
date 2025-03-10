@@ -7,10 +7,10 @@ import os
 import json
 from datetime import datetime
 
-# API Configuration - Use environment variables for sensitive info
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")  # Set this in Vercel Environment Variables
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama3-70b-8192"
+# Groq API configuration - use environment variables
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
+GROQ_API_URL = os.environ.get("GROQ_API_URL", "https://api.groq.com/openai/v1/chat/completions")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama3-70b-8192")
 
 # Create FastAPI app
 app = FastAPI(title="Church AI Assistant")
@@ -49,14 +49,30 @@ class ChurchAssistant:
         }
         
         try:
-            response = requests.post(GROQ_API_URL, headers=self.headers, json=payload)
+            response = requests.post(GROQ_API_URL, headers=self.headers, json=payload, timeout=30)
             response.raise_for_status()
-            result = response.json()
-            return result["choices"][0]["message"]["content"]
+            
+            # Check if response content is valid before parsing
+            if not response.text:
+                return "Error: Empty response received from API"
+                
+            try:
+                result = response.json()
+                if "choices" in result and len(result["choices"]) > 0:
+                    return result["choices"][0]["message"]["content"]
+                else:
+                    return f"Error: Unexpected API response format: {result}"
+            except json.JSONDecodeError as e:
+                return f"Error parsing JSON response: {e}. Response text: {response.text[:100]}..."
+                
+        except requests.exceptions.Timeout:
+            return "Error: Request to API timed out. Please try again later."
         except requests.exceptions.RequestException as e:
             return f"Error communicating with the API: {e}"
         except (KeyError, IndexError) as e:
             return f"Error processing the response: {e}"
+        except Exception as e:
+            return f"Unexpected error: {str(e)}"
     
     def suggest_quiet_time_plan(self, duration_minutes=15, focus_area=None):
         """Generate a quiet time plan based on user preferences"""
@@ -168,33 +184,97 @@ class QuestionRequest(BaseModel):
 # Define API endpoints for Vercel
 @app.get("/api")
 async def root():
-    return {"message": "Church AI Assistant API is running"}
+    return JSONResponse(
+        status_code=200,
+        content={"message": "Church AI Assistant API is running"}
+    )
 
 @app.post("/api/quiet-time")
 async def get_quiet_time(request: QuietTimeRequest):
-    response = assistant.suggest_quiet_time_plan(request.duration, request.focus_area)
-    return {"result": response}
+    try:
+        response = assistant.suggest_quiet_time_plan(request.duration, request.focus_area)
+        return JSONResponse(
+            status_code=200,
+            content={"result": response}
+        )
+    except Exception as e:
+        print(f"Error generating quiet time plan: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "result": "I apologize, but there was an issue generating your quiet time plan. Please try again later.",
+                "error": str(e)
+            }
+        )
 
 @app.post("/api/recommend-books")
 async def get_book_recommendations(request: BookRequest):
-    response = assistant.recommend_books(request.topic, request.spiritual_level, request.count)
-    return {"result": response}
+    try:
+        response = assistant.recommend_books(request.topic, request.spiritual_level, request.count)
+        return JSONResponse(
+            status_code=200,
+            content={"result": response}
+        )
+    except Exception as e:
+        print(f"Error recommending books: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "result": "I apologize, but there was an issue generating book recommendations. Please try again later.",
+                "error": str(e)
+            }
+        )
 
 @app.post("/api/bible-study")
 async def get_bible_study(request: BibleStudyRequest):
-    response = assistant.bible_study_guide(request.passage)
-    return {"result": response}
+    if not request.passage or request.passage.strip() == "":
+        return JSONResponse(
+            status_code=400,
+            content={"result": "Please provide a specific Bible passage for study."}
+        )
+    
+    try:
+        response = assistant.bible_study_guide(request.passage)
+        return JSONResponse(
+            status_code=200,
+            content={"result": response}
+        )
+    except Exception as e:
+        print(f"Error generating Bible study: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "result": "I apologize, but there was an issue generating your Bible study guide. Please try again later.",
+                "error": str(e)
+            }
+        )
 
 @app.post("/api/answer-question")
 async def answer_christian_question(request: QuestionRequest):
     if not request.question or request.question.strip() == "":
-        return {"result": "Please provide a specific question about Christianity."}
+        return JSONResponse(
+            status_code=400,
+            content={"result": "Please provide a specific question about Christianity."}
+        )
     
     try:
         response = assistant.answer_question(request.question)
-        return {"result": response}
+        return JSONResponse(
+            status_code=200,
+            content={"result": response}
+        )
     except Exception as e:
-        # Log the error (Vercel will capture this in logs)
         print(f"Error processing question: {e}")
-        return {"result": "I apologize, but there was an issue processing your question. Please try again later.",
-                "error": str(e)}
+        return JSONResponse(
+            status_code=500,
+            content={
+                "result": "I apologize, but there was an issue processing your question. Please try again later.",
+                "error": str(e)
+            }
+        )
+
+# Add a form-based endpoint for easier testing
+@app.post("/api/form/ask")
+async def form_ask_question(question: str = Form(...)):
+    request = QuestionRequest(question=question)
+    return await answer_christian_question(request)
